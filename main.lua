@@ -33,10 +33,14 @@ local map = {
     {1, 0, 0, 0, 1, 0, 1, 0, 0, 1},
     {1, 0, 0, 0, 4, 0, 1, 0, 0, 1},
     {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {1, 1, 0, 0, 0, 2, 1, 0, 0, 1},
+    {1, 1, 0, 0, 0, 0, 1, 0, 0, 1},
+    {1, 1, 1, 3, 0, 0, 3, 1, 1, 1},
+    {1, 1, 1, 2, 0, 0, 2, 1, 1, 1},
+    {1, 1, 1, 4, 0, 0, 4, 1, 1, 1},
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-
 }
+
+local mouse_sensitive = 50
 
 function love.load()
     love.window.setTitle("Raycaster")
@@ -52,6 +56,8 @@ function love.load()
             end
         end
     end
+    -- lock mouse to window
+    love.mouse.setRelativeMode(true)
 end
 
 function love.update(dt)
@@ -89,11 +95,33 @@ function love.update(dt)
     end
 
     if love.keyboard.isDown("a") then
+        local newX = player.x + math.cos(player.angle - math.pi / 2) * player.speed * dt
+        local newY = player.y + math.sin(player.angle - math.pi / 2) * player.speed * dt
+        if map[math.floor(newY) + 1] and map[math.floor(newY) + 1][math.floor(newX) + 1] == 0 then
+            player.x = newX
+            player.y = newY
+        end
+    end
+
+    if love.keyboard.isDown("d") then
+        local newX = player.x + math.cos(player.angle + math.pi / 2) * player.speed * dt
+        local newY = player.y + math.sin(player.angle + math.pi / 2) * player.speed * dt
+        if map[math.floor(newY) + 1] and map[math.floor(newY) + 1][math.floor(newX) + 1] == 0 then
+            player.x = newX
+            player.y = newY
+        end
+    end
+
+    if love.keyboard.isDown("q") then
         player.angle = player.angle - player.rotSpeed * dt
     end
-    if love.keyboard.isDown("d") then
+    if love.keyboard.isDown("e") then
         player.angle = player.angle + player.rotSpeed * dt
     end
+end
+
+function love.mousemoved(x, y, dx, dy)
+    player.angle = player.angle + dx * (mouse_sensitive * 0.0001)
 end
 
 function love.draw()
